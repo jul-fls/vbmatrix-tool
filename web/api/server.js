@@ -3,7 +3,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 require("dotenv").config({ path: "./.env" });
 
-const { discoverMatrix, fetchMatrixPoints, getLiveConnection, applyAction, sendVBANCommand, queryVBAN } = require("../../helpers"); // reuse your logic
+const { discoverMatrix, fetchMatrixPoints, getLiveConnection, applyAction, queryVBAN } = require("../../helpers"); // reuse your logic
 
 const VBAN_HOST = process.env.VBAN_HOST;
 const VBAN_PORT = process.env.VBAN_PORT || 6980;

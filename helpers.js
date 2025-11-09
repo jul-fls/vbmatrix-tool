@@ -8,7 +8,7 @@ const VBAN_PORT = process.env.VBAN_PORT || 6980;
  *
  * Keeps the same behavior as your working POC.
  */
-function sendVBANCommand(host, message, streamName = "Command1") {
+function sendVBANCommand(host, message, streamName) {
   const server = new VBANServer();
 
   server.on("error", (err) => {
@@ -370,7 +370,7 @@ async function applyAction(sourceName, targetName, action, value = null) {
   }
 
   console.log(`🎛️ Executing: ${cmd}`);
-  sendVBANCommand(VBAN_HOST, cmd);
+  sendVBANCommand(VBAN_HOST, cmd, process.env.VBAN_COMMAND_STREAM_NAME || "Command1");
 }
 
 module.exports = {
