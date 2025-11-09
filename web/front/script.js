@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:8080/api";
+const API_BASE = "/api";
 const matrixContainer = document.getElementById("matrixContainer");
 const statusText = document.getElementById("status");
 const refreshBtn = document.getElementById("refreshBtn");

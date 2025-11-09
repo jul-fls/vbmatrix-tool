@@ -1,16 +1,18 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+require("dotenv").config({ path: "./.env" });
 
 const { discoverMatrix, fetchMatrixPoints, getLiveConnection, applyAction, sendVBANCommand, queryVBAN } = require("../../helpers"); // reuse your logic
 
-const HOST = "192.168.1.230";
-const PORT = 8080;
+const VBAN_HOST = process.env.VBAN_HOST;
+const VBAN_PORT = process.env.VBAN_PORT || 6980;
+const HTTP_PORT = process.env.HTTP_PORT || 3000;
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
-app.use(express.static("../front"));
+app.use(express.static("./web/front"));
 
 /** --- In-memory cache --- **/
 let matrixState = null;
@@ -99,6 +101,6 @@ app.post("/api/refresh", async (req, res) => {
 });
 
 /** --- Start server --- **/
-app.listen(PORT, () => {
-  console.log(`🚀 API server running at http://localhost:${PORT}`);
+app.listen(HTTP_PORT, () => {
+  console.log(`🚀 API server running at http://localhost:${HTTP_PORT}`);
 });

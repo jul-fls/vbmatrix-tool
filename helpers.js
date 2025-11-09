@@ -1,8 +1,7 @@
 const { VBANServer, VBANTEXTPacket, ETextEncoding, EFormatBit } = require("vban");
 
-const HOST = "192.168.1.230";
-const LOCAL_PORT = 7000;
-const VBAN_PORT = 6980;
+const VBAN_HOST = process.env.VBAN_HOST;
+const VBAN_PORT = process.env.VBAN_PORT || 6980;
 
 /**
  * Send a VBAN-TEXT command.
@@ -27,8 +26,8 @@ function sendVBANCommand(host, message, streamName = "Command1") {
       message
     );
 
-    server.send(pkt, 6980, host);
-    console.log(`✅ Sent to ${host}:6980 → ${message}`);
+    server.send(pkt, VBAN_PORT, host);
+    console.log(`✅ Sent to ${host}:${VBAN_PORT} → ${message}`);
     setTimeout(() => server.close(), 100);
   });
 
@@ -135,12 +134,12 @@ async function discoverMatrix() {
   const discovered = {};
 
   for (const suid of suidCandidates) {
-    let info = await queryVBAN(HOST, `Slot(${suid}).Info = ?`).catch(() => null);
+    let info = await queryVBAN(VBAN_HOST, `Slot(${suid}).Info = ?`).catch(() => null);
 
     // Fallback for separated sub-slots (WINx.IN / WINx.OUT)
     if (!info || /Err/i.test(info)) {
-      const inInfo = await queryVBAN(HOST, `Slot(${suid}.IN).Info = ?`).catch(() => null);
-      const outInfo = await queryVBAN(HOST, `Slot(${suid}.OUT).Info = ?`).catch(() => null);
+      const inInfo = await queryVBAN(VBAN_HOST, `Slot(${suid}.IN).Info = ?`).catch(() => null);
+      const outInfo = await queryVBAN(VBAN_HOST, `Slot(${suid}.OUT).Info = ?`).catch(() => null);
 
       if (inInfo || outInfo) {
         const inMatch = inInfo ? inInfo.match(/In:(\d+)/i) : null;
@@ -162,14 +161,14 @@ async function discoverMatrix() {
 
     // Inputs
     for (let i = 1; i <= ins; i++) {
-      const raw = await queryVBAN(HOST, `Input(${suid}.IN[${i}]).Name = ?`).catch(() => "");
+      const raw = await queryVBAN(VBAN_HOST, `Input(${suid}.IN[${i}]).Name = ?`).catch(() => "");
       const name = cleanName(raw);
       if (name && name.length > 0) slot.inputs.push({ ch: i, name });
     }
 
     // Outputs
     for (let j = 1; j <= outs; j++) {
-      const raw = await queryVBAN(HOST, `Output(${suid}.OUT[${j}]).Name = ?`).catch(() => "");
+      const raw = await queryVBAN(VBAN_HOST, `Output(${suid}.OUT[${j}]).Name = ?`).catch(() => "");
       const name = cleanName(raw);
       if (name && name.length > 0) slot.outputs.push({ ch: j, name });
     }
@@ -241,7 +240,7 @@ async function fetchMatrixPoints() {
 
           try {
             const cmd = `${pointBase}.dBGain = ?`;
-            const gainReply = await queryVBAN(HOST, cmd);
+            const gainReply = await queryVBAN(VBAN_HOST, cmd);
             //   console.log(`↩️ ${cmd} → ${gainReply.trim()}`);
 
             if (gainReply && !/Err/i.test(gainReply)) {
@@ -285,7 +284,7 @@ async function fetchMatrixPoints() {
 
           if (pointState.connected) {
             try {
-                const muteReply = await queryVBAN(HOST, `${pointBase}.Mute = ?`);
+                const muteReply = await queryVBAN(VBAN_HOST, `${pointBase}.Mute = ?`);
                 const parts = muteReply.split("=").pop().replace(";", "").trim();
                 const vals = parts.split(",").map(v => parseInt(v.trim(), 10));
                 pointState.mute = vals.some(v => v === 1);
@@ -320,7 +319,7 @@ async function getLiveConnection(srcSuid, dstSuid, inName, outName) {
   const base = `Point(${srcSuid}.IN[${inRange}],${dstSuid}.OUT[${outRange}])`;
 
   // --- Gain ---
-  const gainReply = await queryVBAN(HOST, `${base}.dBGain = ?`);
+  const gainReply = await queryVBAN(VBAN_HOST, `${base}.dBGain = ?`);
   const gainParts = gainReply.split("=").pop().replace(";", "").trim();
   const gainVals = gainParts.split(",").map(v => (/inf/i.test(v) ? -Infinity : parseFloat(v)));
   const allInf = gainVals.every(v => v === -Infinity);
@@ -329,7 +328,7 @@ async function getLiveConnection(srcSuid, dstSuid, inName, outName) {
   const gain = valid.length ? parseFloat((valid.reduce((a,b)=>a+b,0)/valid.length).toFixed(1)) : null;
 
   // --- Mute ---
-  const muteReply = await queryVBAN(HOST, `${base}.Mute = ?`);
+  const muteReply = await queryVBAN(VBAN_HOST, `${base}.Mute = ?`);
   const muteParts = muteReply.split("=").pop().replace(";", "").trim();
   const muteVals = muteParts.split(",").map(v => parseInt(v.trim(), 10));
   const mute = muteVals.some(v => v === 1);
@@ -371,7 +370,7 @@ async function applyAction(sourceName, targetName, action, value = null) {
   }
 
   console.log(`🎛️ Executing: ${cmd}`);
-  sendVBANCommand(HOST, cmd);
+  sendVBANCommand(VBAN_HOST, cmd);
 }
 
 module.exports = {
