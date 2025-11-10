@@ -7,6 +7,39 @@
   padding-bottom: 4rem;
 }
 
+body {
+  overflow: hidden; /* lock global scroll */
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main#matrixContainer {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  padding-bottom: 1rem;
+}
+
+/* Prevent grid from clipping */
+.matrix-grid {
+  min-height: 0; /* crucial for scrollable flex children */
+}
+
+/* Optional: customize scrollbars for modern browsers */
+main#matrixContainer::-webkit-scrollbar {
+  width: 6px;
+}
+main#matrixContainer::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.6);
+  border-radius: 3px;
+}
+main#matrixContainer::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.8);
+}
+
 /* ≥640px (landscape phones, tablets): 2 columns */
 @media (min-width: 640px) {
   .matrix-grid {
