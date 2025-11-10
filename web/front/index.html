@@ -1,111 +1,26 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VBAN Matrix Control</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-      overflow: hidden;
-      background-color: #0a0a0a;
-    }
+<html lang="en" class="bg-gray-950 text-gray-100">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>VBMatrix Tool</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
 
-    #matrixContainer {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 0.75rem;
-      height: calc(100vh - 4rem);
-      width: 100%;
-      padding: 0.75rem;
-      box-sizing: border-box;
-      overflow: hidden;
-    }
+  <body class="min-h-screen flex flex-col items-center p-2 sm:p-4 overflow-hidden">
+    <header class="w-full max-w-7xl mb-4 flex justify-between items-center">
+      <h1 class="text-xl sm:text-2xl font-bold text-blue-400">🎛️ VBMatrix Tool</h1>
+      <div class="flex gap-2 items-center">
+        <button id="refreshBtn" class="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-sm sm:text-base">
+          🔁 Refresh
+        </button>
+        <span id="status" class="text-xs sm:text-sm text-gray-400">Idle</span>
+      </div>
+    </header>
 
-    .matrix-card {
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      background-color: rgb(23 23 23);
-      border: 1px solid rgb(64 64 64);
-      border-radius: 0.75rem;
-      padding: 0.75rem;
-      box-sizing: border-box;
-      overflow: hidden;
-    }
+    <main id="matrixContainer" class="matrix-grid w-full max-w-7xl flex-1 overflow-y-auto"></main>
 
-    .matrix-list {
-      flex: 1;
-      display: grid;
-      grid-auto-rows: 1fr;
-      gap: 0.4rem;
-      overflow: hidden;
-    }
-
-    .matrix-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0.25rem 0.5rem;
-      border-radius: 0.5rem;
-      font-size: 0.875rem;
-      cursor: pointer;
-      transition: background-color 0.2s, border 0.2s, transform 0.1s;
-    }
-
-    .matrix-item.connected {
-      background-color: rgba(16, 83, 16, 0.2);
-      border: 1px solid rgba(34, 197, 94, 0.5);
-    }
-
-    .matrix-item.disconnected {
-      background-color: rgba(38, 38, 38, 0.8);
-      border: 1px solid rgba(64, 64, 64, 0.8);
-    }
-
-    .matrix-item:hover {
-      background-color: rgba(37, 99, 235, 0.15);
-      border-color: rgba(59, 130, 246, 0.5);
-    }
-
-    /* Responsive auto-scaling */
-    @media (max-width: 1400px) {
-      #matrixContainer { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
-      .matrix-item { font-size: 0.8rem; }
-    }
-
-    @media (max-height: 900px) {
-      .matrix-item { padding: 0.15rem 0.4rem; }
-      .matrix-card { padding: 0.5rem; }
-    }
-
-    @keyframes fadeIn {
-        from { background-color: rgba(34,197,94,0.6); }
-        to { background-color: rgba(16,83,16,0.2); }
-    }
-
-    .animate-fadeIn {
-        animation: fadeIn 0.8s ease-out;
-    }
-
-  </style>
-</head>
-<body class="text-gray-200 flex flex-col">
-  <header class="flex items-center justify-between p-3 bg-gray-900 border-b border-gray-800">
-    <h1 class="text-xl font-semibold text-blue-400">🎛️ VBAN Matrix Control</h1>
-    <div class="flex items-center gap-3">
-      <span id="status" class="text-sm text-gray-400">Loading...</span>
-      <button id="refreshBtn"
-        class="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded-lg text-sm font-medium">
-        🔁 Refresh
-      </button>
-    </div>
-  </header>
-
-  <main id="matrixContainer"></main>
-
-  <script src="script.js"></script>
-</body>
+    <script src="script.js"></script>
+  </body>
 </html>
