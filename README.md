@@ -1,5 +1,3 @@
-Parfait 👍 — voici la **version complète et finale** du **README.md** pour ton projet `vbmatrix-tool`, entièrement mise à jour pour correspondre à ton `.env.example` et à la structure réelle du projet (backend Node.js, API Express, VBAN-TEXT, frontend pur HTML/JS/Tailwind).
-
 # vbmatrix-tool
 
 **Outil Node.js pour piloter, visualiser et automatiser une matrice audio VBAN (Voicemeeter Matrix / Banana / Potato)**
