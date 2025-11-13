@@ -1,6 +1,6 @@
 # vbmatrix-tool
 
-**Outil Node.js pour piloter, visualiser et automatiser une matrice audio VBAN (Voicemeeter Matrix / Banana / Potato)**
+**Outil Node.js pour piloter, visualiser et automatiser une matrice audio VBAN (VB Matrix)**
 Envoyez des commandes VBAN-TEXT, contrôlez les gains, mutez, réinitialisez et affichez vos connexions dans une interface web claire et responsive.
 
 ## ✨ Fonctionnalités
@@ -24,7 +24,7 @@ Envoyez des commandes VBAN-TEXT, contrôlez les gains, mutez, réinitialisez et 
 
 ## 📦 Prérequis
 
-* **Voicemeeter VBAN Matrix** (ou **Voicemeeter Banana/Potato**) avec **VBAN-TEXT activé**
+* **VB Matrix** avec **VBAN-TEXT activé**
 * Machine sur le **même réseau local** que le serveur VBAN
 * **Node.js 18+**
 * Accès au port **UDP 6980** (VBAN-TEXT)
@@ -250,7 +250,7 @@ docker run --rm -p 3000:3000 \
 ## 🛠️ Dépannage
 
 * **Aucune donnée détectée**
-  Vérifiez que **VBAN-TEXT est activé** dans Voicemeeter Matrix et que le flux `Command1` (ou un autre flux configuré) est bien configuré.
+  Vérifiez que **VBAN-TEXT est activé** dans VB Matrix et que le flux `Command1` (ou un autre flux configuré) est bien configuré.
 
 * **Pas de réponse UDP**
   Vérifiez les pare-feux Windows ; le port 6980 doit être accessible en UDP.

@@ -273,7 +273,7 @@ fetchAll();
 const restartBtn = document.getElementById("restartBtn");
 
 restartBtn.onclick = async () => {
-  if (!confirm("⚠️ Restart the Voicemeeter audio engine?")) return;
+  if (!confirm("⚠️ Restart the vb matrix audio engine?")) return;
 
   restartBtn.disabled = true;
   refreshBtn.disabled = true;
@@ -282,7 +282,7 @@ restartBtn.onclick = async () => {
   try {
     await fetchJSON(`${API_BASE}/restart`, { method: "POST" });
     statusText.textContent = "✅ Audio engine restarted — refreshing matrix...";
-    // give Voicemeeter a short moment to reinitialize
+    // give vb matrix a short moment to reinitialize
     await new Promise(r => setTimeout(r, 3000));
     await fetchAll();
   } catch (err) {
