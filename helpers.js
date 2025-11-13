@@ -2,6 +2,7 @@ const { VBANServer, VBANTEXTPacket, ETextEncoding, EFormatBit } = require("vban"
 
 const VBAN_HOST = process.env.VBAN_HOST;
 const VBAN_PORT = process.env.VBAN_PORT || 6980;
+const VBAN_COMMAND_STREAM_NAME = process.env.VBAN_COMMAND_STREAM_NAME || "Command1";
 
 /**
  * Send a VBAN-TEXT command.
@@ -370,7 +371,11 @@ async function applyAction(sourceName, targetName, action, value = null) {
   }
 
   console.log(`🎛️ Executing: ${cmd}`);
-  sendVBANCommand(VBAN_HOST, cmd, process.env.VBAN_COMMAND_STREAM_NAME || "Command1");
+  sendVBANCommand(VBAN_HOST, cmd, VBAN_COMMAND_STREAM_NAME);
+}
+
+function restartAudioEngine() {
+  sendVBANCommand(VBAN_HOST, "Command.Restart;", VBAN_COMMAND_STREAM_NAME);
 }
 
 module.exports = {
@@ -378,4 +383,5 @@ module.exports = {
   fetchMatrixPoints,
   applyAction,
   getLiveConnection,
+  restartAudioEngine,
 };

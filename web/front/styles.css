@@ -54,10 +54,10 @@ main#matrixContainer::-webkit-scrollbar-thumb:hover {
   }
 }
 
-/* ≥1440px (wide monitors): 4 columns */
+/* ≥1440px (wide monitors): 5 columns (perfect 5x5 layout) */
 @media (min-width: 1440px) {
   .matrix-grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
   }
 }
 
@@ -140,4 +140,11 @@ button {
 }
 .animate-fadeIn {
   animation: fadeIn 0.8s ease-out;
+}
+
+#restartBtn {
+  background: #ca8a04; /* amber-600 */
+}
+#restartBtn:hover {
+  background: #b45309; /* amber-700 */
 }

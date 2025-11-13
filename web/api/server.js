@@ -3,7 +3,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 require("dotenv").config({ path: "./.env" });
 
-const { discoverMatrix, fetchMatrixPoints, getLiveConnection, applyAction, queryVBAN } = require("../../helpers"); // reuse your logic
+const { discoverMatrix, fetchMatrixPoints, getLiveConnection, applyAction, restartAudioEngine } = require("../../helpers"); // reuse your logic
 
 const VBAN_HOST = process.env.VBAN_HOST;
 const VBAN_PORT = process.env.VBAN_PORT || 6980;
@@ -97,6 +97,18 @@ app.post("/api/refresh", async (req, res) => {
   } catch (err) {
     console.error("❌ Error refreshing:", err);
     res.status(500).json({ error: err.message });
+  }
+});
+
+/** 🔄 Restart audio engine */
+app.post("/api/restart", async (req, res) => {
+  try {
+    restartAudioEngine();
+    console.log("🔄 Audio engine restart requested via API");
+    res.json({ success: true, message: "Audio engine restarted." });
+  } catch (err) {
+    console.error("❌ Failed to restart engine:", err);
+    res.status(500).json({ success: false, error: err.message });
   }
 });
 
