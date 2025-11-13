@@ -5,27 +5,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>VBMatrix Tool</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="styles.css" />
+    <style>
+      /* Optional: scrollbar style via Tailwind’s arbitrary selectors */
+      main::-webkit-scrollbar { width: 6px; }
+      main::-webkit-scrollbar-thumb {
+        background: rgba(100, 116, 139, 0.6);
+        border-radius: 3px;
+      }
+      main::-webkit-scrollbar-thumb:hover {
+        background: rgba(148, 163, 184, 0.8);
+      }
+    </style>
   </head>
 
-  <body class="min-h-screen flex flex-col items-center p-2 sm:p-4 overflow-hidden">
-    <header class="w-full max-w-7xl mb-4 flex justify-between items-center">
+  <body class="h-screen flex flex-col overflow-hidden">
+    <!-- HEADER -->
+    <header class="w-full max-w-7xl mx-auto mb-4 flex justify-between items-center px-2 sm:px-4">
       <h1 class="text-xl sm:text-2xl font-bold text-blue-400">🎛️ VBMatrix Tool</h1>
+
       <div class="flex gap-2 items-center">
-        <button id="restartBtn" class="bg-yellow-600 hover:bg-yellow-700 px-3 py-1 rounded text-sm sm:text-base">
+        <button
+          id="restartBtn"
+          class="bg-amber-600 hover:bg-amber-700 px-3 py-1 rounded text-sm sm:text-base"
+        >
           ♻️ Restart Audio
         </button>
-        <button id="refreshBtn" class="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-sm sm:text-base">
+        <button
+          id="refreshBtn"
+          class="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-sm sm:text-base"
+        >
           🔁 Refresh
         </button>
         <span id="status" class="text-xs sm:text-sm text-gray-400">Idle</span>
       </div>
     </header>
 
-    <main id="matrixContainer"
-      class="matrix-grid w-full flex-1 overflow-y-auto overflow-x-hidden scrollbar-thin">
+    <!-- MAIN GRID -->
+    <main
+      id="matrixContainer"
+      class="flex-1 w-full mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5 gap-3 px-2 sm:px-4 overflow-y-auto overflow-x-hidden scroll-smooth"
+    >
+      <!-- Cards inserted dynamically by JS -->
     </main>
-
 
     <script src="script.js"></script>
   </body>

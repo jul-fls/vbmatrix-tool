@@ -30,7 +30,7 @@ function renderMatrix(connections) {
 
   Object.entries(connections).forEach(([key, pairs]) => {
     const card = document.createElement("div");
-    card.className = "matrix-card";
+    card.className = "bg-gray-900 border border-gray-700 rounded-xl p-3 shadow-md flex flex-col gap-2 transition-transform duration-200 hover:scale-[1.01]";
 
     const title = document.createElement("h2");
     title.textContent = key;
@@ -42,7 +42,12 @@ function renderMatrix(connections) {
 
     Object.entries(pairs).forEach(([pair, data]) => {
       const item = document.createElement("div");
-      item.className = `matrix-item ${data.connected ? "connected" : "disconnected"}`;
+      item.className = [
+        "flex flex-col gap-1 p-2 rounded-md text-sm transition-all duration-200 cursor-pointer",
+        data.connected
+          ? "bg-emerald-900/20 border border-emerald-500/40"
+          : "bg-gray-700/30 border border-gray-600/40 border-dashed hover:bg-blue-600/20"
+      ].join(" ");
 
       // --- Label (safe DOM structure) ---
       const label = document.createElement("div");
@@ -94,15 +99,16 @@ function renderMatrix(connections) {
 
       // --- Controls ---
       const controls = document.createElement("div");
-      controls.className = "flex gap-2 items-center";
+      controls.className = "flex flex-wrap items-center gap-2";
 
       // Mute Button
       const muteBtn = document.createElement("button");
-      muteBtn.className = `p-1.5 rounded transition ${
+      muteBtn.className = [
+        "min-w-[2.25rem] min-h-[2.25rem] rounded transition-colors",
         data.mute
           ? "bg-red-700 hover:bg-red-800"
           : "bg-gray-700 hover:bg-gray-600"
-      }`;
+      ].join(" ");
       muteBtn.textContent = data.mute ? "🔇" : "🔊";
 
       muteBtn.onclick = async () => {
@@ -154,10 +160,10 @@ function renderMatrix(connections) {
       slider.max = 6;
       slider.step = 1;
       slider.value = data.gain ?? 0;
-      slider.className = "cursor-pointer w-24 accent-blue-500";
+      slider.className = "w-32 sm:w-36 accent-blue-500 cursor-pointer touch-none";
 
       const valueLabel = document.createElement("span");
-      valueLabel.className = "w-8 text-xs text-gray-300 text-right";
+      valueLabel.className = "text-xs text-gray-300 w-8 text-right";
       valueLabel.textContent =
         data.gain === -Infinity ? "-∞" : `${data.gain ?? 0}`;
 
