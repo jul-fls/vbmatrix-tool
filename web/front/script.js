@@ -17,7 +17,6 @@ async function fetchAll() {
       fetchJSON(`${API_BASE}/matrix`),
       fetchJSON(`${API_BASE}/connections`),
     ]);
-    globalThis.lastMatrix = matrix;
     renderMatrix(connections);
     statusText.textContent = "✅ Matrix loaded";
   } catch (err) {
@@ -30,44 +29,8 @@ function renderMatrix(connections) {
   matrixContainer.innerHTML = "";
 
   Object.entries(connections).forEach(([key, pairs]) => {
-    const [srcSlot, dstSlot] = key.split(" → ");
-
-    // Check for invalid connection directions
-    const srcHasInputs =
-      globalThis.lastMatrix?.[srcSlot] &&
-      Object.keys(globalThis.lastMatrix[srcSlot].inputs || {}).length > 0;
-
-    const srcHasOutputs =
-      globalThis.lastMatrix?.[srcSlot] &&
-      Object.keys(globalThis.lastMatrix[srcSlot].outputs || {}).length > 0;
-
-    const dstHasInputs =
-      globalThis.lastMatrix?.[dstSlot] &&
-      Object.keys(globalThis.lastMatrix[dstSlot].inputs || {}).length > 0;
-
-    const dstHasOutputs =
-      globalThis.lastMatrix?.[dstSlot] &&
-      Object.keys(globalThis.lastMatrix[dstSlot].outputs || {}).length > 0;
-
-    // 🧩 Filtering rules:
-    // - Skip if device has neither inputs nor outputs (completely empty)
-    // - Skip if source has no outputs (nothing to send)
-    // - Skip if destination has no inputs (nothing to receive)
-    // Skip if invalid source or destination configuration
-    if (
-      (!srcHasInputs && !srcHasOutputs) || // source empty
-      (!dstHasInputs && !dstHasOutputs) || // destination empty
-      !srcHasOutputs || // source can't send
-      !dstHasInputs     // destination can't receive
-    ) return;
-
-    // Skip empty pair groups
-    if (!pairs || Object.keys(pairs).length === 0) return;
-
-    // === CARD ===
     const card = document.createElement("div");
-    card.className =
-      "bg-gray-900 border border-gray-700 rounded-xl p-3 shadow-md flex flex-col gap-2 transition-transform duration-200 hover:scale-[1.01]";
+    card.className = "bg-gray-900 border border-gray-700 rounded-xl p-3 shadow-md flex flex-col gap-2 transition-transform duration-200 hover:scale-[1.01]";
 
     const title = document.createElement("h2");
     title.textContent = key;
@@ -294,7 +257,6 @@ function renderMatrix(connections) {
       list.appendChild(item);
     });
 
-    if (list.children.length === 0) return;
     card.appendChild(list);
     matrixContainer.appendChild(card);
   });
