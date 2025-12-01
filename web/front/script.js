@@ -257,8 +257,10 @@ function renderMatrix(connections) {
       list.appendChild(item);
     });
 
-    card.appendChild(list);
-    matrixContainer.appendChild(card);
+    if(list.children.length !== 0) {
+      card.appendChild(list);
+      matrixContainer.appendChild(card);
+    }
   });
 }
 
