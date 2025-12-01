@@ -127,9 +127,11 @@ function cleanName(raw) {
 
 async function discoverMatrix() {
   const suidCandidates = [
-    "WIN1", "WIN2", "WIN3", "WIN4",
-    "VBAN1", "VBAN2", "VBAN3", "VBAN4",
-    "VAIO1", "VAIO2", "VAIO3", "VAIO4"
+    "ASIO32", "ASIO64A", "ASIO64B", "ASIO128", "ASIO256A", "ASIO256B", "ASIO512",
+    "WIN1", "WIN2", "WIN3", "WIN4", "WIN5", "WIN6", "WIN7", "WIN8", "WIN32", "WIN64",
+    "VAIO1", "VAIO2", "VAIO3", "VAIO4", "VAIO5", "VAIO6", "VAIO7", "VAIO8",
+    "VBAN1", "VBAN2", "VBAN3", "VBAN4", "VBAN5", "VBAN6", "VBAN7", "VBAN8", "VBAN64", "VBAN128",
+    "VASIO8", "VASIO32", "VASIO64A", "VASIO64B", "VASIO128", "VASIO256A", "VASIO256B", "VASIO512",
   ];
 
   const discovered = {};
