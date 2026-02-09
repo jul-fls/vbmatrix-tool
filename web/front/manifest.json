@@ -1,0 +1,35 @@
+{
+    "background_color": "white",
+    "theme_color": "white",
+    "description": "Outil Node.js pour piloter, visualiser et automatiser une matrice audio VBAN (VB Matrix)",
+    "display": "standalone",
+    "icons": [
+      {
+        "src": "ressources/ensemble_scolaire_lyce_sainte_famille_saintonge_formation_logo_512x512.png",
+        "sizes": "512x512",
+        "type": "image/png",
+        "purpose": "maskable any"
+      }
+    ],
+    "name": "VBMatrix Tool",
+    "short_name": "VBMatrix Tool",
+    "start_url": "https://vbmatrixtool.flusin.fr/",
+    "scope": "/",
+    "scope_url": "https://vbmatrixtool.flusin.fr/",
+    "prefer_related_applications": false,
+    "handle_links": "preferred",
+    "launch_handler": {
+      "client_mode": ["navigate-existing", "auto"]
+    },
+    "intent_filters": {
+      "scope_url_scheme": "https",
+      "scope_url_host": "vbmatrixtool.flusin.fr",
+      "scope_url_path": "/"
+    },
+    "related_applications": [
+      {
+        "platform": "webapp",
+        "url": "https://vbmatrixtool.flusin.fr/manifest.json"
+      }
+    ]
+  }

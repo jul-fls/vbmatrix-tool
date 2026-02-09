@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>VBMatrix Tool</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="manifest" href="manifest.json" />
     <style>
       /* Optional: scrollbar style via Tailwind’s arbitrary selectors */
       main::-webkit-scrollbar { width: 6px; }
@@ -47,7 +48,11 @@
     >
       <!-- Cards inserted dynamically by JS -->
     </main>
-
+    <script>
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("/sw.js");
+      }
+    </script>
     <script src="script.js"></script>
   </body>
 </html>
