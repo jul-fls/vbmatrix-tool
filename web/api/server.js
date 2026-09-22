@@ -17,17 +17,48 @@ app.use(express.static("./web/front"));
 /** --- In-memory cache --- **/
 let matrixState = null;
 let connectionState = null;
+let refreshInFlight = null;
+let refreshIsFull = false;
+
+async function refreshMatrixAndConnections({ full = false } = {}) {
+  if (refreshInFlight) {
+    if (!full || refreshIsFull) return refreshInFlight;
+    try {
+      await refreshInFlight;
+    } catch (err) {
+      console.error("❌ Connection refresh failed before full refresh:", err);
+    }
+    return refreshMatrixAndConnections({ full: true });
+  }
+
+  refreshIsFull = full || !matrixState;
+  refreshInFlight = (async () => {
+    console.log("🔁 Refreshing matrix and connections...");
+    const nextMatrix = refreshIsFull ? await discoverMatrix() : matrixState;
+    if (!Object.keys(nextMatrix).length) throw new Error("No matrix slots discovered");
+    const nextConnections = await fetchMatrixPoints(nextMatrix);
+    matrixState = nextMatrix;
+    global.matrixState = nextMatrix;
+    connectionState = nextConnections;
+    return { matrix: matrixState, connections: connectionState };
+  })();
+
+  try {
+    return await refreshInFlight;
+  } finally {
+    refreshInFlight = null;
+    refreshIsFull = false;
+  }
+}
 
 /** --- Initialize matrix on startup --- **/
 (async () => {
-  console.log("🔄 Discovering matrix...");
-  matrixState = await discoverMatrix();
-  global.matrixState = matrixState;
-  console.log("✅ Matrix ready");
-
-  console.log("🔄 Fetching connections...");
-  connectionState = await fetchMatrixPoints();
-  console.log("✅ Connection matrix ready");
+  try {
+    await refreshMatrixAndConnections({ full: true });
+    console.log("✅ Matrix and connections ready");
+  } catch (err) {
+    console.error("❌ Initial matrix refresh failed:", err);
+  }
 })();
 
 /** --- GET /api/matrix --- **/
@@ -89,11 +120,8 @@ app.post("/api/action", async (req, res) => {
 /** --- POST /api/refresh --- **/
 app.post("/api/refresh", async (req, res) => {
   try {
-    console.log("🔁 Refreshing matrix and connections...");
-    matrixState = await discoverMatrix();
-    global.matrixState = matrixState;
-    connectionState = await fetchMatrixPoints();
-    res.json({ ok: true, message: "Matrix and connections refreshed" });
+    const { matrix, connections } = await refreshMatrixAndConnections({ full: req.body?.full === true });
+    res.json({ ok: true, message: "Matrix and connections refreshed", matrix, connections });
   } catch (err) {
     console.error("❌ Error refreshing:", err);
     res.status(500).json({ error: err.message });

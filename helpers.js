@@ -125,6 +125,21 @@ function cleanName(raw) {
   return fallback.length > 0 ? fallback : "";
 }
 
+function parseGainValues(reply) {
+  const match = typeof reply === "string" && reply.match(/=\s*([^;]+)/);
+  if (!match || /Err/i.test(reply)) throw new Error(`Invalid gain response: ${reply}`);
+
+  const values = match[1].split(",").map((part) => {
+    const value = part.trim();
+    if (/^-inf(?:inity)?$/i.test(value)) return -Infinity;
+    return value ? Number(value) : NaN;
+  });
+  if (values.some((value) => Number.isNaN(value))) {
+    throw new Error(`Invalid gain response: ${reply}`);
+  }
+  return values;
+}
+
 async function discoverMatrix() {
   const suidCandidates = [
     "ASIO32", "ASIO64A", "ASIO64B", "ASIO128", "ASIO256A", "ASIO256B", "ASIO512",
@@ -219,10 +234,8 @@ async function discoverMatrix() {
   return matrix;
 }
 
-async function fetchMatrixPoints() {
-  if (!global.matrixState) throw new Error("Matrix not initialized");
-
-  const matrix = global.matrixState;
+async function fetchMatrixPoints(matrix = global.matrixState) {
+  if (!matrix) throw new Error("Matrix not initialized");
   const state = {};
 
   for (const [srcSuid, src] of Object.entries(matrix)) {
@@ -237,61 +250,41 @@ async function fetchMatrixPoints() {
           const pointBase = `Point(${srcSuid}.IN[${inRange}],${dstSuid}.OUT[${outRange}])`;
           const label = `${inName} → ${outName}`;
 
-          let connected = false;
-          let gain = 0;
-          let mute = false;
+          let pointState = {
+            connected: false,
+            gain: -Infinity,
+            gains: [],
+            mute: false,
+          };
 
           try {
             const cmd = `${pointBase}.dBGain = ?`;
             const gainReply = await queryVBAN(VBAN_HOST, cmd);
-            //   console.log(`↩️ ${cmd} → ${gainReply.trim()}`);
+            const numericVals = parseGainValues(gainReply);
 
-            if (gainReply && !/Err/i.test(gainReply)) {
-                const match = gainReply.match(/=\s*([^\;]+)/);
-                if (match) {
-                    // Parse all returned gains
-                    const values = match[1]
-                        .split(",")
-                        .map(v => v.trim())
-                        .filter(v => v.length > 0);
-
-                    // Convert to numbers and keep raw list
-                    const numericVals = values.map(v =>
-                        /inf/i.test(v) ? -Infinity : parseFloat(v)
-                    );
-
-                    const allInf = numericVals.every(v => v === -Infinity);
-                    connected = !allInf;
-
-                    // Compute the average gain (ignore -inf)
-                    const validGains = numericVals.filter(v => v !== -Infinity);
-                    let avgGain = -Infinity;
-
-                    if (validGains.length > 0) {
-                        const sum = validGains.reduce((a, b) => a + b, 0);
-                        avgGain = parseFloat((sum / validGains.length).toFixed(1));
-                    }
-
-                    // Save structured data
-                    pointState = {
-                        connected,
-                        gain: avgGain,
-                        gains: numericVals,
-                        mute: false // will update below
-                    };
-                }
-            }
-            } catch (err) {
-            console.log(`⚠️ Error querying ${pointBase}:`, err.message);
-            }
+            const validGains = numericVals.filter(Number.isFinite);
+            pointState = {
+              connected: validGains.length > 0,
+              gain: validGains.length
+                ? Number((validGains.reduce((a, b) => a + b, 0) / validGains.length).toFixed(1))
+                : -Infinity,
+              gains: numericVals,
+              mute: false,
+            };
+          } catch (err) {
+            throw new Error(`Error querying ${pointBase}: ${err.message}`);
+          }
 
           if (pointState.connected) {
             try {
                 const muteReply = await queryVBAN(VBAN_HOST, `${pointBase}.Mute = ?`);
+                if (/Err/i.test(muteReply)) throw new Error(`Invalid mute response: ${muteReply}`);
                 const parts = muteReply.split("=").pop().replace(";", "").trim();
                 const vals = parts.split(",").map(v => parseInt(v.trim(), 10));
                 pointState.mute = vals.some(v => v === 1);
-            } catch {}
+            } catch (err) {
+                throw new Error(`Error querying mute for ${pointBase}: ${err.message}`);
+            }
         }
 
           state[pairKey][label] = pointState;
@@ -300,8 +293,6 @@ async function fetchMatrixPoints() {
     }
   }
 
-  console.log("🎚️ Full matrix state (Input ➜ Output):");
-  console.log(JSON.stringify(state, null, 2));
   return state;
 }
 
@@ -323,8 +314,7 @@ async function getLiveConnection(srcSuid, dstSuid, inName, outName) {
 
   // --- Gain ---
   const gainReply = await queryVBAN(VBAN_HOST, `${base}.dBGain = ?`);
-  const gainParts = gainReply.split("=").pop().replace(";", "").trim();
-  const gainVals = gainParts.split(",").map(v => (/inf/i.test(v) ? -Infinity : parseFloat(v)));
+  const gainVals = parseGainValues(gainReply);
   const allInf = gainVals.every(v => v === -Infinity);
   const connected = !allInf;
   const valid = gainVals.filter(v => v !== -Infinity);
@@ -360,6 +350,11 @@ async function applyAction(sourceName, targetName, action, value = null) {
   let cmd = "";
   switch (action) {
     case "gain":
+      if (typeof value !== "number" || !Number.isFinite(value) ||
+          (value !== -99 && (value < -80 || value > 6 ||
+            Math.abs(value * 10 - Math.round(value * 10)) > 1e-8))) {
+        throw new Error("Gain must be -99 or between -80 and 6 dB in 0.1 dB steps");
+      }
       cmd = `${cmdBase}.dBGain=${value};`;
       break;
     case "mute":
